@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import csv
 from pprint import pprint
 from py_pdf_parser.loaders import load_file
 from py_pdf_parser.tables import extract_table, add_header_to_table
@@ -67,6 +68,15 @@ def flatten(ls):
     return [item for sublist in ls for item in sublist]
 
 
+def quote_newlines(lst):
+    for line in lst:
+        # replace all \n with \\n
+        for k, v in line.items():
+            line[k] = v.replace("\n", "\\n")
+
+    return lst
+
+
 def build_balance_sheet(lst):
     table = []
     columns = ["DATE", "DESCRIPTION", "WITHDRAWAL", "DEPOSIT", "BALANCE"]
@@ -95,6 +105,8 @@ def build_balance_sheet(lst):
 
         if any(row):
             table.append(row)
+
+    table = quote_newlines(table)
     return table
 
 
@@ -104,10 +116,19 @@ if __name__ == "__main__":
         "-f", "--file", required=True, type=str, help="PDF file to parse"
     )
     parser.add_argument(
+        "-o", "--output", required=False, type=str, help="Output file to write"
+    )
+    parser.add_argument(
         "-v", "--visualize", required=False, type=bool, help="Visualize document"
     )
     args = parser.parse_args()
 
     res = POSB(path=args.file, visualize=args.visualize)
     d = build_balance_sheet(res.table)
-    pprint(d)
+    # pprint(d)
+
+    if args.output is not None:
+        with open(args.output, mode="w") as f:
+            writer = csv.DictWriter(f, d[0].keys())
+            writer.writeheader()
+            writer.writerows(d)
