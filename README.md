@@ -2,19 +2,19 @@
 
 Export SG bank statements from PDF to CSV. Supported banks:
 
-- DBS/POSB
-- [ ] UOB
+- [x] DBS/POSB
+- [x] UOB
 - [ ] OCBC
 - [ ] SCB
 
 ## Usage
 
 ```bash
-# write to csv
-$ ./main.py -f FILE.pdf -o output.csv
+# write POSB statement to csv
+$ ./main.py -p FILE.pdf -f output.csv
 
 # visualize pdf
-$ ./main.py -f FILE.pdf -v true
+$ ./main.py -p FILE.pdf -v
 ```
 
 ### Read CSV
